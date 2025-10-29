@@ -38,7 +38,7 @@ function SimpleNavigationBar({ activeTab, onTabPress }) {
 function HomeScreen({ onNavigate }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>AxiomPath 🚀</Text>
+      <Text style={styles.title}>I3dad 🚀</Text>
       <Text style={styles.subtitle}>Find Your Perfect College Major</Text>
       <TouchableOpacity style={styles.button} onPress={() => onNavigate('assessment')}>
         <Text style={styles.buttonText}>Start Assessment</Text>
