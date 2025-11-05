@@ -10,29 +10,57 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { t } from '../../utils/languages';
+import { signIn } from '../../services/authService';
 
 const { width } = Dimensions.get('window');
 
 export default function LoginScreen({ onSwitchToSignup, navigateTo }) {
   const { currentLanguage, textDirection } = useLanguage();
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '', // Changed from 'email' to 'identifier'
     password: ''
   });
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
 
   const handleLogin = async () => {
-    if (!formData.email || !formData.password) {
+    if (!formData.identifier || !formData.password) {
       alert(t('fillAllFields', currentLanguage));
       return;
     }
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      alert('Login functionality will be connected to authService next');
-    }, 1000);
+    
+    const result = await signIn(formData.identifier, formData.password);
+    
+    setLoading(false);
+
+    if (result.success) {
+      // Auto-redirect based on user type
+      switch (result.userType) {
+        case 'student':
+          navigateTo('student-dashboard');
+          break;
+        case 'principal':
+          navigateTo('principal-dashboard');
+          break;
+        case 'ministry_official':
+          navigateTo('ministry-dashboard');
+          break;
+        default:
+          navigateTo('dashboard');
+      }
+    } else {
+      alert(result.error);
+    }
+  };
+
+  // Helper to show what type of identifier was entered
+  const getIdentifierType = () => {
+    if (formData.identifier.startsWith('+972')) return '📱 Phone';
+    if (/^\d{9}$/.test(formData.identifier)) return '🆔 Israeli ID';
+    if (formData.identifier.includes('@')) return '📧 Email';
+    return '';
   };
 
   const isRTL = textDirection === 'rtl';
@@ -63,27 +91,32 @@ export default function LoginScreen({ onSwitchToSignup, navigateTo }) {
 
           {/* Form */}
           <View style={styles.form}>
-            {/* Email Input */}
+            {/* Identifier Input (Email, Phone, or Israeli ID) */}
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isRTL && styles.rtlText]}>
-                {t('email', currentLanguage)}
+                Email, Phone, or Israeli ID
               </Text>
               <View style={[
                 styles.inputContainer,
-                focusedField === 'email' && styles.inputFocused
+                focusedField === 'identifier' && styles.inputFocused
               ]}>
                 <TextInput
                   style={[styles.input, isRTL && styles.rtlInput]}
-                  placeholder={t('emailPlaceholder', currentLanguage)}
+                  placeholder="email@example.com or +9725... or 123456789"
                   placeholderTextColor="#64748B"
-                  value={formData.email}
-                  onChangeText={(text) => setFormData({...formData, email: text})}
-                  onFocus={() => setFocusedField('email')}
+                  value={formData.identifier}
+                  onChangeText={(text) => setFormData({...formData, identifier: text})}
+                  onFocus={() => setFocusedField('identifier')}
                   onBlur={() => setFocusedField(null)}
-                  keyboardType="email-address"
+                  keyboardType="default"
                   autoCapitalize="none"
                 />
               </View>
+              {getIdentifierType() && (
+                <Text style={styles.helperText}>
+                  {getIdentifierType()}
+                </Text>
+              )}
             </View>
 
             {/* Password Input */}
@@ -230,6 +263,13 @@ const styles = StyleSheet.create({
   },
   rtlInput: {
     textAlign: 'right',
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#94A3B8',
+    textAlign: 'center',
+    marginTop: -5,
+    marginBottom: 5,
   },
   forgotPassword: {
     alignSelf: 'flex-start',
