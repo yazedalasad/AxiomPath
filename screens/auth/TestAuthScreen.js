@@ -8,12 +8,13 @@ import {
   Alert 
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { signUp, signIn, getCurrentUser, logout } from '../../services/authService';
+import { signUpStudent, signIn, getCurrentUser, logout, getUserProfile } from '../../services/authService';
 
 export default function TestAuthScreen({ navigateTo }) {
   const [status, setStatus] = useState('Ready to test...');
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [currentProfile, setCurrentProfile] = useState(null);
 
   const runTest = async (testName, testFunction) => {
     setLoading(true);
@@ -41,59 +42,104 @@ export default function TestAuthScreen({ navigateTo }) {
     }
   };
 
-  // Test 1: Sign Up
-  const testSignUp = async () => {
+  // Test 1: Student Sign Up
+  const testStudentSignUp = async () => {
+    const timestamp = Date.now();
     const testData = {
       firstName: 'Test',
-      lastName: 'User',
-      email: `test${Date.now()}@example.com`,
-      phone: '+1234567890',
-      studentId: `2024${Date.now()}`,
+      lastName: 'Student',
+      email: `student${timestamp}@example.com`,
+      phone: `+97250${timestamp.toString().slice(-8)}`,
+      israeliId: `1234567${timestamp.toString().slice(-2)}`, // Valid Israeli ID format
+      dateOfBirth: '2000-01-01',
       password: 'password123',
-      confirmPassword: 'password123'
     };
     
-    return await signUp(testData);
+    return await signUpStudent(testData);
   };
 
-  // Test 2: Sign In
-  const testSignIn = async () => {
-    return await signIn('test@example.com', 'password123');
+  // Test 2: Sign In with Israeli ID
+  const testSignInWithIsraeliId = async () => {
+    // This will use the auto-detection to find user by Israeli ID
+    return await signIn('123456789', 'password123'); // Use a real Israeli ID from your test data
   };
 
-  // Test 3: Get Current User
+  // Test 3: Sign In with Phone
+  const testSignInWithPhone = async () => {
+    // This will use the auto-detection to find user by phone
+    return await signIn('+972501234567', 'password123'); // Use a real phone from your test data
+  };
+
+  // Test 4: Sign In with Email
+  const testSignInWithEmail = async () => {
+    return await signIn('student@example.com', 'password123'); // Use a real email from your test data
+  };
+
+  // Test 5: Get Current User
   const testGetCurrentUser = async () => {
     const result = await getCurrentUser();
     if (result.success) {
       setCurrentUser(result.user);
+      
+      // Also get the full profile
+      const profileResult = await getUserProfile(result.user.id);
+      if (profileResult.success) {
+        setCurrentProfile(profileResult.data);
+      }
     }
     return result;
   };
 
-  // Test 4: Logout
+  // Test 6: Logout
   const testLogout = async () => {
     const result = await logout();
     if (result.success) {
       setCurrentUser(null);
+      setCurrentProfile(null);
     }
     return result;
   };
 
-  // Test 5: Full Auth Flow
-  const testFullAuthFlow = async () => {
-    setStatus('Starting full auth flow test...');
+  // Test 7: Full Student Auth Flow
+  const testFullStudentAuthFlow = async () => {
+    setStatus('Starting full student auth flow test...');
     
-    // Step 1: Sign Up
-    const signupResult = await testSignUp();
+    // Step 1: Student Sign Up
+    const signupResult = await testStudentSignUp();
     if (!signupResult.success) return signupResult;
     
-    // Step 2: Get Current User
+    // Step 2: Get Current User & Profile
     const userResult = await testGetCurrentUser();
     if (!userResult.success) return userResult;
     
     // Step 3: Logout
     const logoutResult = await testLogout();
     return logoutResult;
+  };
+
+  // Test 8: Test Auto-Detection Login
+  const testAutoDetectionLogin = async () => {
+    setStatus('Testing auto-detection login...');
+    
+    // Test with different identifier types
+    const tests = [
+      { type: 'Email', identifier: 'student@example.com' },
+      { type: 'Phone', identifier: '+972501234567' },
+      { type: 'Israeli ID', identifier: '123456789' }
+    ];
+    
+    for (const test of tests) {
+      setStatus(`Testing ${test.type} login...`);
+      const result = await signIn(test.identifier, 'password123');
+      if (!result.success) {
+        return { success: false, error: `${test.type} login failed: ${result.error}` };
+      }
+      
+      // Logout between tests
+      await logout();
+    }
+    
+    return { success: true, message: 'All auto-detection login tests passed!' };
   };
 
   return (
@@ -108,14 +154,28 @@ export default function TestAuthScreen({ navigateTo }) {
       
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>🧪 Auth Service Tests</Text>
-        <Text style={styles.subtitle}>Test your Supabase connection</Text>
+        <Text style={styles.subtitle}>Test your multi-user authentication system</Text>
 
         {/* Current User Info */}
-        {currentUser && (
+        {(currentUser || currentProfile) && (
           <View style={styles.userInfo}>
-            <Text style={styles.userTitle}>Current User:</Text>
-            <Text style={styles.userText}>ID: {currentUser.id}</Text>
-            <Text style={styles.userText}>Email: {currentUser.email}</Text>
+            <Text style={styles.userTitle}>Current Session:</Text>
+            {currentUser && (
+              <>
+                <Text style={styles.userText}>User ID: {currentUser.id}</Text>
+                <Text style={styles.userText}>Email: {currentUser.email}</Text>
+              </>
+            )}
+            {currentProfile && (
+              <>
+                <Text style={styles.userText}>Name: {currentProfile.first_name} {currentProfile.last_name}</Text>
+                <Text style={styles.userText}>Type: {currentProfile.user_type}</Text>
+                <Text style={styles.userText}>Phone: {currentProfile.phone}</Text>
+                {currentProfile.israeli_id && (
+                  <Text style={styles.userText}>Israeli ID: {currentProfile.israeli_id}</Text>
+                )}
+              </>
+            )}
           </View>
         )}
 
@@ -123,18 +183,42 @@ export default function TestAuthScreen({ navigateTo }) {
         <View style={styles.testButtons}>
           <TouchableOpacity 
             style={[styles.testButton, styles.signupTest]}
-            onPress={() => runTest('Sign Up', testSignUp)}
+            onPress={() => runTest('Student Sign Up', testStudentSignUp)}
             disabled={loading}
           >
-            <Text style={styles.testButtonText}>🧪 Test Sign Up</Text>
+            <Text style={styles.testButtonText}>🎓 Test Student Sign Up</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={[styles.testButton, styles.signinTest]}
-            onPress={() => runTest('Sign In', testSignIn)}
+            onPress={() => runTest('Sign In (Email)', testSignInWithEmail)}
             disabled={loading}
           >
-            <Text style={styles.testButtonText}>🔐 Test Sign In</Text>
+            <Text style={styles.testButtonText}>📧 Sign In (Email)</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.testButton, styles.phoneTest]}
+            onPress={() => runTest('Sign In (Phone)', testSignInWithPhone)}
+            disabled={loading}
+          >
+            <Text style={styles.testButtonText}>📱 Sign In (Phone)</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.testButton, styles.idTest]}
+            onPress={() => runTest('Sign In (Israeli ID)', testSignInWithIsraeliId)}
+            disabled={loading}
+          >
+            <Text style={styles.testButtonText}>🆔 Sign In (Israeli ID)</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.testButton, styles.autoTest]}
+            onPress={() => runTest('Auto-Detection Login', testAutoDetectionLogin)}
+            disabled={loading}
+          >
+            <Text style={styles.testButtonText}>🔍 Test Auto-Detection</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -155,10 +239,10 @@ export default function TestAuthScreen({ navigateTo }) {
 
           <TouchableOpacity 
             style={[styles.testButton, styles.fullTest]}
-            onPress={() => runTest('Full Auth Flow', testFullAuthFlow)}
+            onPress={() => runTest('Full Student Auth Flow', testFullStudentAuthFlow)}
             disabled={loading}
           >
-            <Text style={styles.testButtonText}>🔄 Full Auth Flow Test</Text>
+            <Text style={styles.testButtonText}>🔄 Full Student Auth Flow</Text>
           </TouchableOpacity>
         </View>
 
@@ -171,10 +255,11 @@ export default function TestAuthScreen({ navigateTo }) {
         {/* Instructions */}
         <View style={styles.instructions}>
           <Text style={styles.instructionsTitle}>📋 Testing Instructions:</Text>
-          <Text style={styles.instruction}>1. Start with "Test Sign Up"</Text>
-          <Text style={styles.instruction}>2. Check browser console for detailed logs</Text>
-          <Text style={styles.instruction}>3. Verify user appears in Supabase dashboard</Text>
-          <Text style={styles.instruction}>4. Try "Full Auth Flow" for complete test</Text>
+          <Text style={styles.instruction}>1. Start with "Test Student Sign Up"</Text>
+          <Text style={styles.instruction}>2. Test different login methods (Email, Phone, Israeli ID)</Text>
+          <Text style={styles.instruction}>3. Try "Auto-Detection" to test smart login</Text>
+          <Text style={styles.instruction}>4. Check browser console for detailed logs</Text>
+          <Text style={styles.instruction}>5. Verify users in Supabase dashboard</Text>
         </View>
 
         {/* Navigation */}
@@ -253,14 +338,23 @@ const styles = StyleSheet.create({
   signinTest: {
     backgroundColor: '#3B82F6',
   },
-  userTest: {
+  phoneTest: {
     backgroundColor: '#8B5CF6',
+  },
+  idTest: {
+    backgroundColor: '#EC4899',
+  },
+  autoTest: {
+    backgroundColor: '#F59E0B',
+  },
+  userTest: {
+    backgroundColor: '#6B7280',
   },
   logoutTest: {
     backgroundColor: '#EF4444',
   },
   fullTest: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#7C3AED',
   },
   testButtonText: {
     color: '#FFFFFF',

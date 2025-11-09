@@ -11,7 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { t } from '../../utils/languages';
-import { signUpStudent } from '../../services/authService'; // Changed to signUpStudent
+import { signUpStudent } from '../../services/authService';
 
 const { width } = Dimensions.get('window');
 
@@ -22,8 +22,8 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
     lastName: '',
     email: '',
     phone: '',
-    israeliId: '', // Changed from studentId to israeliId
-    dateOfBirth: '', // Added date of birth
+    israeliId: '',
+    dateOfBirth: '',
     password: '',
     confirmPassword: ''
   });
@@ -35,18 +35,18 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
     if (!formData.firstName || !formData.lastName || !formData.email || 
         !formData.phone || !formData.israeliId || !formData.dateOfBirth ||
         !formData.password || !formData.confirmPassword) {
-      alert('Please fill all required fields');
+      alert(t('fillRequiredFields', currentLanguage));
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      alert(t('passwordsDontMatch', currentLanguage));
       return;
     }
 
     // Validate Israeli phone format
     if (!/^\+9725[0-9]{8}$/.test(formData.phone)) {
-      alert('Phone must be in format: +9725XXXXXXXX');
+      alert(t('invalidPhone', currentLanguage));
       return;
     }
 
@@ -58,13 +58,13 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
         lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
-        israeliId: formData.israeliId, // Changed from studentId
-        dateOfBirth: formData.dateOfBirth, // Added
+        israeliId: formData.israeliId,
+        dateOfBirth: formData.dateOfBirth,
         password: formData.password,
       });
 
       if (result.success) {
-        alert('Student account created successfully!');
+        alert(t('studentAccountCreated', currentLanguage));
         onSwitchToLogin();
       } else {
         alert(result.error);
@@ -99,10 +99,10 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
             {/* Header */}
             <View style={styles.header}>
               <Text style={styles.title}>
-                Create Student Account
+                {t('createStudentAccount', currentLanguage)}
               </Text>
               <Text style={styles.subtitle}>
-                Join the career discovery platform
+                {t('joinPlatform', currentLanguage)}
               </Text>
             </View>
 
@@ -112,7 +112,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
               <View style={styles.row}>
                 <View style={[styles.inputGroup, styles.halfInput]}>
                   <Text style={[styles.label, isRTL && styles.rtlText]}>
-                    First Name *
+                    {t('firstName', currentLanguage)} *
                   </Text>
                   <View style={[
                     styles.inputContainer,
@@ -120,7 +120,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
                   ]}>
                     <TextInput
                       style={[styles.input, isRTL && styles.rtlInput]}
-                      placeholder="Enter your first name"
+                      placeholder={t('firstNamePlaceholder', currentLanguage)}
                       placeholderTextColor="#64748B"
                       value={formData.firstName}
                       onChangeText={(text) => setFormData({...formData, firstName: text})}
@@ -133,7 +133,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
 
                 <View style={[styles.inputGroup, styles.halfInput]}>
                   <Text style={[styles.label, isRTL && styles.rtlText]}>
-                    Last Name *
+                    {t('lastName', currentLanguage)} *
                   </Text>
                   <View style={[
                     styles.inputContainer,
@@ -141,7 +141,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
                   ]}>
                     <TextInput
                       style={[styles.input, isRTL && styles.rtlInput]}
-                      placeholder="Enter your last name"
+                      placeholder={t('lastNamePlaceholder', currentLanguage)}
                       placeholderTextColor="#64748B"
                       value={formData.lastName}
                       onChangeText={(text) => setFormData({...formData, lastName: text})}
@@ -156,7 +156,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
               {/* Email */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.label, isRTL && styles.rtlText]}>
-                  Email *
+                  {t('email', currentLanguage)} *
                 </Text>
                 <View style={[
                   styles.inputContainer,
@@ -164,7 +164,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
                 ]}>
                   <TextInput
                     style={[styles.input, isRTL && styles.rtlInput]}
-                    placeholder="email@example.com"
+                    placeholder={t('emailPlaceholder', currentLanguage)}
                     placeholderTextColor="#64748B"
                     value={formData.email}
                     onChangeText={(text) => setFormData({...formData, email: text})}
@@ -180,7 +180,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
               <View style={styles.row}>
                 <View style={[styles.inputGroup, styles.halfInput]}>
                   <Text style={[styles.label, isRTL && styles.rtlText]}>
-                    Phone *
+                    {t('phone', currentLanguage)} *
                   </Text>
                   <View style={[
                     styles.inputContainer,
@@ -188,7 +188,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
                   ]}>
                     <TextInput
                       style={[styles.input, isRTL && styles.rtlInput]}
-                      placeholder="+972501234567"
+                      placeholder={t('phonePlaceholder', currentLanguage)}
                       placeholderTextColor="#64748B"
                       value={formData.phone}
                       onChangeText={(text) => setFormData({...formData, phone: text})}
@@ -201,7 +201,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
 
                 <View style={[styles.inputGroup, styles.halfInput]}>
                   <Text style={[styles.label, isRTL && styles.rtlText]}>
-                    Israeli ID *
+                    {t('israeliId', currentLanguage)} *
                   </Text>
                   <View style={[
                     styles.inputContainer,
@@ -209,7 +209,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
                   ]}>
                     <TextInput
                       style={[styles.input, isRTL && styles.rtlInput]}
-                      placeholder="123456789"
+                      placeholder={t('israeliIdPlaceholder', currentLanguage)}
                       placeholderTextColor="#64748B"
                       value={formData.israeliId}
                       onChangeText={(text) => setFormData({...formData, israeliId: text})}
@@ -225,7 +225,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
               {/* Date of Birth */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.label, isRTL && styles.rtlText]}>
-                  Date of Birth *
+                  {t('dateOfBirth', currentLanguage)} *
                 </Text>
                 <View style={[
                   styles.inputContainer,
@@ -233,7 +233,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
                 ]}>
                   <TextInput
                     style={[styles.input, isRTL && styles.rtlInput]}
-                    placeholder="YYYY-MM-DD"
+                    placeholder={t('dateOfBirthPlaceholder', currentLanguage)}
                     placeholderTextColor="#64748B"
                     value={formData.dateOfBirth}
                     onChangeText={(text) => setFormData({...formData, dateOfBirth: text})}
@@ -246,7 +246,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
               {/* Password */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.label, isRTL && styles.rtlText]}>
-                  Password *
+                  {t('password', currentLanguage)} *
                 </Text>
                 <View style={[
                   styles.inputContainer,
@@ -254,7 +254,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
                 ]}>
                   <TextInput
                     style={[styles.input, isRTL && styles.rtlInput]}
-                    placeholder="Create password"
+                    placeholder={t('passwordPlaceholder', currentLanguage)}
                     placeholderTextColor="#64748B"
                     secureTextEntry
                     value={formData.password}
@@ -268,7 +268,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
               {/* Confirm Password */}
               <View style={styles.inputGroup}>
                 <Text style={[styles.label, isRTL && styles.rtlText]}>
-                  Confirm Password *
+                  {t('confirmPassword', currentLanguage)} *
                 </Text>
                 <View style={[
                   styles.inputContainer,
@@ -276,7 +276,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
                 ]}>
                   <TextInput
                     style={[styles.input, isRTL && styles.rtlInput]}
-                    placeholder="Confirm your password"
+                    placeholder={t('confirmPasswordPlaceholder', currentLanguage)}
                     placeholderTextColor="#64748B"
                     secureTextEntry
                     value={formData.confirmPassword}
@@ -300,7 +300,7 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
                   end={{ x: 1, y: 0 }}
                 >
                   <Text style={styles.signupButtonText}>
-                    {loading ? 'Creating Account...' : 'Create Student Account'}
+                    {loading ? t('signingUp', currentLanguage) : t('createStudentAccountBtn', currentLanguage)}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -308,11 +308,11 @@ export default function SignupScreen({ onSwitchToLogin, navigateTo }) {
               {/* Switch to Login */}
               <View style={[styles.switchContainer, isRTL && styles.rtlSwitch]}>
                 <Text style={styles.switchText}>
-                  Already have an account?
+                  {t('hasAccount', currentLanguage)}
                 </Text>
                 <TouchableOpacity onPress={onSwitchToLogin}>
                   <Text style={styles.switchLink}>
-                    Sign In
+                    {t('signIn', currentLanguage)}
                   </Text>
                 </TouchableOpacity>
               </View>

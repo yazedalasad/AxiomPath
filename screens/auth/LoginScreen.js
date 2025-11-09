@@ -17,7 +17,7 @@ const { width } = Dimensions.get('window');
 export default function LoginScreen({ onSwitchToSignup, navigateTo }) {
   const { currentLanguage, textDirection } = useLanguage();
   const [formData, setFormData] = useState({
-    identifier: '', // Changed from 'email' to 'identifier'
+    identifier: '',
     password: ''
   });
   const [loading, setLoading] = useState(false);
@@ -57,10 +57,10 @@ export default function LoginScreen({ onSwitchToSignup, navigateTo }) {
 
   // Helper to show what type of identifier was entered
   const getIdentifierType = () => {
-    if (formData.identifier.startsWith('+972')) return '📱 Phone';
-    if (/^\d{9}$/.test(formData.identifier)) return '🆔 Israeli ID';
-    if (formData.identifier.includes('@')) return '📧 Email';
-    return '';
+    if (formData.identifier.startsWith('+972')) return t('phoneDetected', currentLanguage);
+    if (/^\d{9}$/.test(formData.identifier)) return t('israeliIdDetected', currentLanguage);
+    if (formData.identifier.includes('@')) return t('emailDetected', currentLanguage);
+    return t('enterIdentifier', currentLanguage);
   };
 
   const isRTL = textDirection === 'rtl';
@@ -94,7 +94,7 @@ export default function LoginScreen({ onSwitchToSignup, navigateTo }) {
             {/* Identifier Input (Email, Phone, or Israeli ID) */}
             <View style={styles.inputGroup}>
               <Text style={[styles.label, isRTL && styles.rtlText]}>
-                Email, Phone, or Israeli ID
+                {t('identifier', currentLanguage)}
               </Text>
               <View style={[
                 styles.inputContainer,
@@ -102,7 +102,7 @@ export default function LoginScreen({ onSwitchToSignup, navigateTo }) {
               ]}>
                 <TextInput
                   style={[styles.input, isRTL && styles.rtlInput]}
-                  placeholder="email@example.com or +9725... or 123456789"
+                  placeholder={t('identifierPlaceholder', currentLanguage)}
                   placeholderTextColor="#64748B"
                   value={formData.identifier}
                   onChangeText={(text) => setFormData({...formData, identifier: text})}
@@ -112,11 +112,9 @@ export default function LoginScreen({ onSwitchToSignup, navigateTo }) {
                   autoCapitalize="none"
                 />
               </View>
-              {getIdentifierType() && (
-                <Text style={styles.helperText}>
-                  {getIdentifierType()}
-                </Text>
-              )}
+              <Text style={styles.helperText}>
+                {getIdentifierType()}
+              </Text>
             </View>
 
             {/* Password Input */}

@@ -20,7 +20,7 @@ const authTranslations = {
   
   // Buttons
   login: { en: 'Sign In', ar: 'تسجيل الدخول', he: 'כניסה' },
-  signup: { en: 'Sign Up', ar: 'إنشاء حساب', he: 'הרשמה' },
+  signUp: { en: 'Sign Up', ar: 'إنشاء حساب', he: 'הרשמה' },
   signingIn: { en: 'Signing In...', ar: 'جاري التسجيل...', he: 'מתחבר...' },
   signingUp: { en: 'Creating Account...', ar: 'جاري إنشاء الحساب...', he: 'יוצר חשבון...' },
   createStudentAccountBtn: { en: 'Create Student Account', ar: 'إنشاء حساب طالب', he: 'יצירת חשבון סטודנט' },
@@ -95,12 +95,122 @@ const userTypeTranslations = {
 // ========================
 
 // COMBINE ALL TRANSLATIONS (automatically merges everything)
+// Add these to your translations object
+const TestTranslations = {
+  // Test instructions
+  smartTest: { en: 'Smart Career Test', ar: 'اختبار المسار الذكي', he: 'מבחן קריירה חכם' },
+  testDescription: { en: 'Discover your strengths and interests', ar: 'اكتشف نقاط قوتك واهتماماتك', he: 'גלה את החוזקות והתחומי העניין שלך' },
+  instruction1: { en: 'Answer honestly - no right or wrong answers', ar: 'أجب بصدق - لا توجد إجابات صحيحة أو خاطئة', he: 'ענה בכנות - אין תשובות נכונות או שגויות' },
+  instruction2: { en: 'Take your time with each question', ar: 'خذ وقتك مع كل سؤال', he: 'קח את הזמן עם כל שאלה' },
+  instruction3: { en: 'Choose "I don\'t know" if unsure', ar: 'اختر "لا أعرف" إذا كنت غير متأكد', he: 'בחר "אני לא יודע" אם אינך בטוח' },
+  instruction4: { en: 'The test adapts to your answers', ar: 'الاختبار يتكيف مع إجاباتك', he: 'המבחן מותאם לתשובות שלך' },
+  
+  // Test buttons
+  startTest: { en: 'Start Smart Test', ar: 'بدء الاختبار الذكي', he: 'התחל מבחן חכם' },
+  nextQuestion: { en: 'Next Question', ar: 'السؤال التالي', he: 'שאלה הבאה' },
+  submitAnswer: { en: 'Submit Answer', ar: 'إرسال الإجابة', he: 'שלח תשובה' },
+  
+  // Test messages
+  startingTest: { en: 'Starting test...', ar: 'جاري بدء الاختبار...', he: 'מתחיל מבחן...' },
+  gettingQuestion: { en: 'Getting question...', ar: 'جاري تحميل السؤال...', he: 'טוען שאלה...' },
+  submittingAnswer: { en: 'Submitting answer...', ar: 'جاري إرسال الإجابة...', he: 'שולח תשובה...' },
+  testSessionCreated: { en: 'Test session created:', ar: 'تم إنشاء جلسة الاختبار:', he: 'סשן מבחן נוצר:' },
+  questionLoaded: { en: 'Question loaded:', ar: 'تم تحميل السؤال:', he: 'שאלה נטענה:' },
+  answerSubmitted: { en: 'Answer submitted:', ar: 'تم إرسال الإجابة:', he: 'תשובה נשלחה:' },
+  
+  // Feedback messages
+  quickAndCorrect: { en: 'Great! Quick and correct!', ar: 'ممتاز! سريع وصحيح!', he: 'מצוין! מהיר ונכון!' },
+  correctAnswer: { en: 'Correct! Well done!', ar: 'صحيح! أحسنت!', he: 'נכון! כל הכבוד!' },
+  admitDontKnow: { en: 'Honest answer - we will help you learn!', ar: 'إجابة صادقة - سنساعدك على التعلم!', he: 'תשובה כנה - נעזור לך ללמוד!' },
+  incorrectTryAgain: { en: 'Good try! Let\'s continue learning', ar: 'محاولة جيدة! دعنا نواصل التعلم', he: 'ניסיון טוב! בוא נמשיך ללמוד' },
+  
+  // Error messages
+  errorStartingTest: { en: 'Error starting test:', ar: 'خطأ في بدء الاختبار:', he: 'שגיאה בהתחלת המבחן:' },
+  errorGettingQuestion: { en: 'Error getting question:', ar: 'خطأ في تحميل السؤال:', he: 'שגיאה בטעינת השאלה:' },
+  errorSubmittingAnswer: { en: 'Error submitting answer:', ar: 'خطأ في إرسال الإجابة:', he: 'שגיאה בשליחת התשובה:' }
+
+  ,howItWorks: { en: 'How It Works', ar: 'كيف يعمل', he: 'איך זה עובד' },
+  learnMore: { en: 'Learn More', ar: 'تعلم المزيد', he: 'למד עוד' },
+  explanation: { en: 'Explanation', ar: 'شرح', he: 'הסבר' },
+  difficulty: { en: 'Difficulty', ar: 'الصعوبة', he: 'קושי' },
+  testComplete: { en: 'Test Complete!', ar: 'تم الانتهاء من الاختبار!', he: 'המבחן הושלם!' },
+  discoverYourPotential: { en: 'Discover Your Potential', ar: 'اكتشف إمكانياتك', he: 'גלה את הפוטנציאל שלך' },
+  yourResults: { en: 'Your Results', ar: 'نتائجك', he: 'התוצאות שלך' },
+  potentialMatch: { en: 'Potential Match', ar: 'تطابق محتمل', he: 'התאמה פוטנציאלית' },
+  topStrengths: { en: 'Top Strengths', ar: 'أهم نقاط القوة', he: 'חוזקות עיקריות' },
+  careerSuggestions: { en: 'Career Suggestions', ar: 'اقتراحات مهنية', he: 'הצעות קריירה' },
+  viewDetailedReport: { en: 'View Detailed Report', ar: 'عرض التقرير المفصل', he: 'צפה בדוח מפורט' },
+  retakeTest: { en: 'Retake Test', ar: 'إعادة الاختبار', he: 'בצע מבחן מחדש' },
+of: { en: 'of', ar: 'من', he: 'מתוך' },
+  greatStart: { en: 'Great start! Keep going!', ar: 'بداية رائعة! استمر!', he: 'התחלה מצוינת! המשיך!' },
+  keepGoing: { en: 'You\'re doing great! Keep going!', ar: 'أنت تبلي بلاءً حسناً! استمر!', he: 'אתה מצוין! המשיך!' },
+  almostThere: { en: 'Almost there! You\'re amazing!', ar: 'كدت تصل! أنت مذهل!', he: 'כמעט שם! אתה מדהים!' },
+  finalPush: { en: 'Final push! You\'ve got this!', ar: 'الدفعة الأخيرة! يمكنك فعلها!', he: 'דחיפה אחרונה! אתה יכול!' },
+  
+  // Learning Module
+  learningTime: { en: 'Learning Time!', ar: 'وقت التعلم!', he: 'זמן learning!' },
+  realWorldApplication: { en: 'Real World Application', ar: 'التطبيق في العالم الحقيقي', he: 'יישום בעולם האמיתי' },
+  careerConnections: { en: 'Career Connections', ar: 'الاتصالات المهنية', he: 'קשרי קריירה' },
+  researchScience: { en: 'Research & Science', ar: 'البحث والعلوم', he: 'מחקר ומדע' },
+  technology: { en: 'Technology', ar: 'التكنولوجيا', he: 'טכנולוגיה' },
+  dataAnalysis: { en: 'Data Analysis', ar: 'تحليل البيانات', he: 'ניתוח נתונים' },
+  learningTips: { en: 'Learning Tips', ar: 'نصائح التعلم', he: 'טיפים ללמידה' },
+  tip1: { en: 'Practice regularly to build skills', ar: 'تمرن بانتظام لبناء المهارات', he: 'התאמן באופן קבוע כדי לבנות כישורים' },
+  tip2: { en: 'Connect concepts to real life', ar: 'اربط المفاهيم بالحياة الواقعية', he: 'חבר מושגים לחיים האמיתיים' },
+  tip3: { en: 'Ask questions when curious', ar: 'اطرح الأسئلة عندما تكون فضولياً', he: 'שאל שאלות כשאתה סקרן' },
+  continueTest: { en: 'Continue Test', ar: 'متابعة الاختبار', he: 'המשך מבחן' },
+clearSelection: { en: 'Clear', ar: 'مسح', he: 'נקה' },
+  notSure: { en: 'Not Sure?', ar: 'لست متأكد؟', he: 'לא בטוח?' },
+  
+  // Timer and difficulty
+  timeSpent: { en: 'Time', ar: 'الوقت', he: 'זמן' },
+  
+  // Option tags (you can add more based on your interest_tags)
+  analytical: { en: 'Analytical', ar: 'تحليلي', he: 'אנליטי' },
+  creative: { en: 'Creative', ar: 'إبداعي', he: 'יצירתי' },
+  technical: { en: 'Technical', ar: 'تقني', he: 'טכני' },
+  practical: { en: 'Practical', ar: 'عملي', he: 'מעשי' },
+  error: { en: 'Error', ar: 'خطأ', he: 'שגיאה' },
+  ok: { en: 'OK', ar: 'موافق', he: 'אישור' },
+  questions: { en: 'questions', ar: 'أسئلة', he: 'שאלות' },
+  approxTime: { en: '10-15 minutes', ar: '10-15 دقيقة', he: '10-15 דקות' },
+  loadingNextQuestion: { en: 'Loading next question...', ar: 'جاري تحميل السؤال التالي...', he: 'טוען שאלה הבאה...' },
+  questionsCompleted: { en: 'questions completed', ar: 'أسئلة مكتملة', he: 'שאלות הושלמו' },
+  detailedReport: { en: 'Detailed Report', ar: 'تقرير مفصل', he: 'דוח מפורט' },
+  detailedReportMessage: { en: 'Full detailed report with comprehensive analysis will be available in the full version.', ar: 'التقرير المفصل الكامل مع التحليل الشامل سيكون متاحاً في النسخة الكاملة.', he: 'דוח מפורט מלא עם ניתוח מקיף יהיה זמין בגרסה המלאה.' },
+  
+  // Feature descriptions
+  discoverStrengthsDesc: { en: 'Identify your natural talents and abilities', ar: 'حدد مواهبك وقدراتك الطبيعية', he: 'זהה את הכישרונות והיכולות הטבעיים שלך' },
+  findPassionsDesc: { en: 'Discover what truly motivates and interests you', ar: 'اكتشف ما يلهمك ويهتم بك حقاً', he: 'גלה מה באמת מעורר ומעניין אותך' },
+  careerGuidanceDesc: { en: 'Get personalized career path recommendations', ar: 'احصل على توصيات مسار مهني مخصصة', he: 'קבל המלצות מסלול קריירה אישיות' },
+  
+  // Additional feedback messages
+  thoughtfulCorrect: { en: 'Well thought out! Correct answer!', ar: 'مدروسة جيداً! إجابة صحيحة!', he: 'מחושב היטב! תשובה נכונה!' },
+};
+// Add to your translations in utils/languages.js
+const testTranslations = {
+  smartTest: { en: 'Smart Career Test', ar: 'اختبار المسار الذكي', he: 'מבחן קריירה חכם' },
+  testDescription: { en: 'Discover your strengths and interests', ar: 'اكتشف نقاط قوتك واهتماماتك', he: 'גלה את החוזקות והתחומי העניין שלך' },
+  discoverStrengths: { en: 'Discover your hidden talents', ar: 'اكتشف مواهبك الخفية', he: 'גלה את הכישרונות החבויים שלך' },
+  findPassions: { en: 'Find what truly excites you', ar: 'اكتشف ما يثير حماسك حقاً', he: 'מצא מה באמת מלהיב אותך' },
+  careerGuidance: { en: 'Get personalized career guidance', ar: 'احصل على توجيه مهني مخصص', he: 'קבל הכוונה קריירה אישית' },
+  startJourney: { en: 'Start My Journey', ar: 'ابدأ رحلتي', he: 'התחל את המסע שלי' },
+  question: { en: 'Question', ar: 'سؤال', he: 'שאלה' },
+  nextQuestion: { en: 'Next Question', ar: 'السؤال التالي', he: 'שאלה הבאה' },
+  loadingQuestion: { en: 'Loading next question...', ar: 'جاري تحميل السؤال التالي...', he: 'טוען שאלה הבאה...' },
+  preparingTest: { en: 'Preparing your test...', ar: 'جاري تحضير الاختبار...', he: 'מכין את המבחן שלך...' },
+};
+
+// Don't forget to add testTranslations to your main translations object
+
+// Add to your existing translations
 export const translations = {
   ...authTranslations,
   ...formTranslations, 
   ...errorTranslations,
-  ...userTypeTranslations
-  // ADD NEW SECTIONS HERE: ...yourNewSection
+  ...userTypeTranslations,
+  ...TestTranslations,
+  ...testTranslations,// Add the new test translations
 };
 
 // ========================
