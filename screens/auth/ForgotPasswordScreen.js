@@ -5,14 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CustomButton from '../../components/Form/CustomButton';
 import CustomTextInput from '../../components/Form/CustomTextInput';
-import { useAuth } from '../../contexts/AuthContext';
-import { validateEmail, validatePassword } from '../../utils/validation';
+import { supabase } from '../../config/supabase';
+import { validateEmail } from '../../utils/validation';
 
-export default function LoginScreen({ navigateTo }) {
-  const { signIn } = useAuth();
+export default function ForgotPasswordScreen({ navigateTo }) {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -24,37 +22,47 @@ export default function LoginScreen({ navigateTo }) {
       newErrors.email = emailValidation.error;
     }
 
-    const passwordValidation = validatePassword(password);
-    if (!passwordValidation.isValid) {
-      newErrors.password = passwordValidation.error;
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleLogin = async () => {
+  const handleSendCode = async () => {
     if (!validateForm()) {
       return;
     }
 
     setLoading(true);
-    const { data, error } = await signIn(email, password);
-    setLoading(false);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://your-app-url.com/reset-password',
+      });
 
-    if (error) {
-      let errorMessage = 'حدث خطأ أثناء تسجيل الدخول';
+      setLoading(false);
+
+      if (error) {
+        throw error;
+      }
+
+      Alert.alert(
+        'تم الإرسال!',
+        'تم إرسال رمز التحقق المكون من 6 أرقام إلى بريدك الإلكتروني',
+        [
+          {
+            text: 'حسناً',
+            onPress: () => navigateTo('verifyCode', { email }),
+          },
+        ]
+      );
+    } catch (error) {
+      setLoading(false);
+      let errorMessage = 'حدث خطأ أثناء إرسال رمز التحقق';
       
-      if (error.message.includes('Invalid login credentials')) {
-        errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
-      } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = 'يرجى تأكيد بريدك الإلكتروني أولاً';
+      if (error.message.includes('User not found')) {
+        errorMessage = 'البريد الإلكتروني غير مسجل';
       }
 
       Alert.alert('خطأ', errorMessage);
-    } else {
-      // Navigation will be handled by AuthContext
-      console.log('Login successful');
     }
   };
 
@@ -74,15 +82,24 @@ export default function LoginScreen({ navigateTo }) {
           end={{ x: 1, y: 1 }}
         >
           <View style={styles.logoContainer}>
-            <FontAwesome name="graduation-cap" size={60} color="#fff" />
+            <FontAwesome name="lock" size={60} color="#fff" />
           </View>
-          <Text style={styles.title}>{t('auth.login.title')}</Text>
-          <Text style={styles.subtitle}>{t('auth.login.subtitle')}</Text>
+          <Text style={styles.title}>{t('auth.forgotPassword.title')}</Text>
+          <Text style={styles.subtitle}>
+            {t('auth.forgotPassword.subtitle')}
+          </Text>
         </LinearGradient>
 
         <View style={styles.formContainer}>
+          <View style={styles.infoBox}>
+            <FontAwesome name="info-circle" size={20} color="#27ae60" />
+            <Text style={styles.infoText}>
+              {t('auth.forgotPassword.info')}
+            </Text>
+          </View>
+
           <CustomTextInput
-            label={t('auth.login.email')}
+            label={t('auth.forgotPassword.email')}
             value={email}
             onChangeText={(text) => {
               setEmail(text);
@@ -96,54 +113,19 @@ export default function LoginScreen({ navigateTo }) {
             error={errors.email}
           />
 
-          <CustomTextInput
-            label={t('auth.login.password')}
-            value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              if (errors.password) {
-                setErrors({ ...errors, password: null });
-              }
-            }}
-            placeholder={t('auth.login.password')}
-            icon="lock"
-            secureTextEntry
-            error={errors.password}
-          />
-
-          <TouchableOpacity
-            style={styles.forgotPassword}
-            onPress={() => navigateTo('forgotPassword')}
-          >
-            <Text style={styles.forgotPasswordText}>{t('auth.login.forgotPassword')}</Text>
-          </TouchableOpacity>
-
           <CustomButton
-            title={t('auth.login.loginButton')}
-            onPress={handleLogin}
-            icon="sign-in"
+            title={t('auth.forgotPassword.sendCode')}
+            onPress={handleSendCode}
+            icon="paper-plane"
             loading={loading}
           />
 
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>{t('common.or')}</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>{t('auth.login.noAccount')} </Text>
-            <TouchableOpacity onPress={() => navigateTo('signup')}>
-              <Text style={styles.signupLink}>{t('auth.login.signupLink')}</Text>
-            </TouchableOpacity>
-          </View>
-
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => navigateTo('home')}
+            onPress={() => navigateTo('login')}
           >
             <FontAwesome name="arrow-right" size={16} color="#64748b" />
-            <Text style={styles.backButtonText}>{t('auth.login.backToHome')}</Text>
+            <Text style={styles.backButtonText}>{t('auth.forgotPassword.backToLogin')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -186,6 +168,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     opacity: 0.9,
     textAlign: 'center',
+    paddingHorizontal: 20,
   },
   formContainer: {
     flex: 1,
@@ -195,44 +178,23 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     marginTop: -20,
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0fdf4',
+    padding: 16,
+    borderRadius: 12,
     marginBottom: 24,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: '#86efac',
   },
-  forgotPasswordText: {
-    color: '#27ae60',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 24,
-  },
-  dividerLine: {
+  infoText: {
     flex: 1,
-    height: 1,
-    backgroundColor: '#e2e8f0',
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: '#64748b',
+    color: '#166534',
     fontSize: 14,
-  },
-  signupContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  signupText: {
-    color: '#64748b',
-    fontSize: 16,
-  },
-  signupLink: {
-    color: '#27ae60',
-    fontSize: 16,
-    fontWeight: '600',
+    lineHeight: 20,
+    textAlign: 'right',
   },
   backButton: {
     flexDirection: 'row',
@@ -240,6 +202,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 12,
+    marginTop: 16,
   },
   backButtonText: {
     color: '#64748b',
